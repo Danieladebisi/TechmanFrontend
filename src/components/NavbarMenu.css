@@ -1,0 +1,11 @@
+.nav-link {
+    text-decoration: none; /* Removes underline */
+    color: "blue"!important; /* Default color */
+    font-weight: 500; /* Optional: Adjust font weight */
+    transition: color 0.3s ease; /* Smooth transition */
+  }
+  
+  .nav-link:hover {
+    color: "#3d85c6"!important; /* Default color */
+    text-decoration: underline; /* Optional */
+  }
