@@ -2,6 +2,7 @@ import Samsung from '../assets/Samsung.jpg';
 import Iphone from '../assets/Iphone.jpg';
 import Laptop from '../assets/Laptop.jpg';
 import Accessories from '../assets/Accessories.jpg';
+// import LazyLoad from 'react-lazyload';
 
 export default function Section() {
   return (
@@ -13,6 +14,7 @@ export default function Section() {
               src={Iphone}
               class="card-img-top"
               alt="Hollywood Sign on The Hill"
+              loading='lazy'
             />
             <div class="card-body">
               <h5 class="card-title">Iphone</h5>
@@ -28,6 +30,7 @@ export default function Section() {
               src={Samsung}
               class="card-img-top"
               alt="Palm Springs Road"
+              loading='lazy'
             />
             <div class="card-body">
               <h5 class="card-title">Samsung</h5>
@@ -43,6 +46,7 @@ export default function Section() {
               src={Laptop}
               class="card-img-top"
               alt="Los Angeles Skyscrapers"
+              loading='lazy'
             />
             <div class="card-body">
               <h5 class="card-title">Laptops</h5>
@@ -58,6 +62,7 @@ export default function Section() {
               src={Accessories}
               class="card-img-top"
               alt="Skyscrapers"
+              loading='lazy'
             />
             <div class="card-body">
               <h5 class="card-title">Accessories</h5>
