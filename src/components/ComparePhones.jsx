@@ -6,23 +6,40 @@ import Iphone16 from "../assets/Iphone16.jpg";
 
 const phoneData = [
   {
-    name: "Realme P3 Pro",
+    name: "Samsung P3 Pro",
     image: Galaxy,
     specs: [
       { title: "📶 NETWORK", description: "Technology: GSM / HSPA / LTE / 5G" },
       { title: "📅 LAUNCH", description: "Announced: 2025, February 12" },
-      { title: "📏 BODY", description: "Dimensions: 167.4 x 77.4 x 8 mm" },
+      { title: "📏 BODY", description: "Dimensions: 167.4 x 77.4 x 8 mm; " },
       { title: "📱 DISPLAY", description: "Type: PLS LCD, 800 nits (HBM)" },
+      { title: "📷 MAIN CAMERA", description: "Modules: 50 MP, f/1.8, (wide), PDAF - 2 MP, f/2.4 (depth)" },
+      { title: "🤳 SELFIE CAMERA", description: "Modules: 8 MP, f/2.0, (wide), 1/4.0, 1.12µm " },
+      { title: "🔊 SOUND", description: "Loudspeaker: Yes, Vide: Yes" },
+      { title: "📡 COMMS", description: "WLAN:  Wi-Fi 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct, Bluetooth: 5.3 A2DP LE", },
+      { title: "🔋 BATTERY", description: "Type: Li-Ion 5000 mAhm, Charging: 25W wired ", },
+      { title: "⚙ FEATURES", description: "Sensors: Fingerprint (side-mounted), accelerometer, proximity, compas", },
+      { title: "🎨 MISC", description: "Colors:Bahama Blue, Lit Violet, SAR: 1.05 W/kg (head), SAR EU:  1.30 W/kg (body), 1.30 W/kg (head) ", },
     ],
   },
   {
     name: "Apple iPhone 16e",
     image: Iphone16,
     specs: [
-      { title: "📶 NETWORK", description: "Technology: GSM / HSPA / LTE / 5G" },
+      { title: "📶 NETWORK", description: "Technology: GSM / LTE/ HSPA / 5G" },
       { title: "📅 LAUNCH", description: "Announced: 2025, February 12" },
       { title: "📏 BODY", description: "Dimensions: 167.4 x 77.4 x 8 mm" },
-      { title: "📱 DISPLAY", description: "Type: Super Retina OLED" },
+      { title: "📱 DISPLAY", description: "Type: SPJD LCD, 3565 nits (HBM)" },
+      { title: "📷 MAIN CAMERA", description: "Modules: 60 MP, f/4.8, (wide), PDAF - 5 MP, f/6.4 (depth)"  },
+      { title: "🤳 SELFIE CAMERA", description: "Modules: 5 MP, f/1.0, (wide), 2/4.0, 1.12µm " },
+      { title: "🔊 SOUND", description: "Loudspeaker: Yes, Video: Yes" },
+      { 
+        "title": "📡 COMMS",
+        "description": "**WLAN:** Wi-Fi 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct\n**Bluetooth:** 5.3 A2DP LE"
+       },
+       { title: "🔋 BATTERY", description: "Type: Li-Ion 4000 mAhm, Charging: 22W wired ", },
+       { title: "⚙ FEATURES", description: "Sensors: Fingerprint (side-mounted), accelerometer, proximity, compas", },
+       { title: "🎨 MISC", description: "Colors:Bahama Blue, Lit Violet, SAR: 1.05 W/kg (head), SAR EU:  1.30 W/kg (body), 1.30 W/kg (head) ", },
     ],
   },
 ];

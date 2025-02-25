@@ -226,7 +226,7 @@ const Compare = () => {
             <Accordion.Header>🔊 SOUND</Accordion.Header>
             <Accordion.Body>
               <strong>Loudspeaker:</strong> Yes <br />
-              <strong>3.5mm Jack:</strong> Yes
+              <strong>Loudspeaker:</strong> Yes
             </Accordion.Body>
           </Accordion.Item>
 
