@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { BsChatText, BsColumnsGap, BsImage, BsDiagram3 } from "react-icons/bs";
+import { BsColumnsGap, BsImage, BsDiagram3 } from "react-icons/bs";
 import { FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { Collapse } from "react-bootstrap";
@@ -11,7 +11,7 @@ const MenuList = () => {
   const menuItems = [
     //{ icon: <BsChatText size={20} />, text: "READ OPINIONS", path: "/opinions" },
     { icon: <BsImage size={20} />, text: "PICTURES", path: "/pictures" },
-    { icon: <BsDiagram3 size={20} />, text: "RELATED PHONES", path: "/related-phones" },
+    { icon: <BsDiagram3 size={20} />, text: "RELATED", path: "/pictures" },
   ];
 
   return (
@@ -36,11 +36,6 @@ const MenuList = () => {
             Compare Phones
           </Link>
         </div>
-        {/* <div>
-          <Link to="/phonePictures" className="list-group-item list-group-item-action ps-5 text-decoration-none">
-            Compare Phones
-          </Link>
-        </div> */}
       </Collapse>
 
       {/* Other Menu Items */}

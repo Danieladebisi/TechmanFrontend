@@ -9,6 +9,7 @@ import ComparePhones from "./components/ComparePhones.jsx";
 import PhonePictures from "./components/Pictures.jsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Login from "./components/LogIn.jsx";
+//import Admin from "./components/Admin.jsx";
 
 // ✅ Fixed Router Configuration
 const router = createBrowserRouter([
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "comparePhones", element: <ComparePhones /> },
       { path: "pictures", element: <PhonePictures /> },
       { path: "login", element: <Login /> },
+      //{ path: "admin", element: <Admin /> },
     ],
   },
 ]);
