@@ -9,7 +9,7 @@ import Logo from "../assets/Logo.png";
 import { Link } from "react-router-dom";
 import "./NavbarMenu.css";
 
-function NavbarMenu() {
+function NavbarMenu({ admin, onLogout }) {
   // State to store logged-in user details
   // const [user, setUser] = useState(null);
   // const [email, setEmail] = useState("");
@@ -93,7 +93,7 @@ function NavbarMenu() {
               }
               id="navbarDropdown"
             >
-              {!user ? (
+              {admin && (
                 <Form className="p-3" onSubmit={handleLogin}>
                   <Form.Group className="mb-3" controlId="formEmail">
                     <Form.Label>Email</Form.Label>

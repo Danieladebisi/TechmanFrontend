@@ -44,7 +44,7 @@ const Login = () => {
           showConfirmButton: false,
         });
 
-        navigate("/"); // Redirect to Home
+        navigate("/adminDashboard"); // Redirect to Home
       } else {
         Swal.fire({
           icon: "error",
