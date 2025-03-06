@@ -32,7 +32,7 @@ const Login = () => {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      localStorage.setItem("adminEmail", userCredential.user.email);
 
       // Verify if the user is the admin
       if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
@@ -94,7 +94,7 @@ const Login = () => {
               </span>
               <input
                 type="email"
-                placeholder="Admin Email"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="form-control"
@@ -110,7 +110,7 @@ const Login = () => {
               </span>
               <input
                 type="password"
-                placeholder="Admin Password"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="form-control"

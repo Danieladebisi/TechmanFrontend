@@ -12,7 +12,7 @@ const AdminDashboard = () => {
   const [admin, setAdmin] = useState({ name: "", email: "", image: "" });
 
   const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "https://localhost:7240/api",
+    baseURL: import.meta.env.VITE_API_URL,
   });
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const adminEmail = localStorage.getItem("adminEmail"); // Assuming email is stored after login
     if (adminEmail) {
-      API.get(`/login?email=${adminEmail}`)
+      API.get(`/auth/login`)
         .then((response) => setAdmin(response.data))
         .catch((error) =>
           console.error("Error fetching admin details:", error)
@@ -234,7 +234,167 @@ const AdminDashboard = () => {
                   </Form.Group>
                 </Form.Group>
                 <Form.Group className="mb-3">
-                  <Form.Label>Type</Form.Label>
+                  <Form.Label>Network</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Launch</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Body</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Display</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Platform</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Memories</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>MainCameras</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>SelfieCameras</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Sound</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Communications</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Features</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Battery</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Miscs</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Protections</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Modules</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Brightness</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Charging</Form.Label>
                   <Form.Control
                     type="text"
                     name="type"
@@ -254,5 +414,73 @@ const AdminDashboard = () => {
     </>
   );
 };
+
+// import React, { useMemo, useRef, useState } from 'react';
+// import { Select, Spin } from 'antd';
+// import debounce from 'lodash/debounce';
+// function DebounceSelect({ fetchOptions, debounceTimeout = 800, ...props }) {
+//   const [fetching, setFetching] = useState(false);
+//   const [options, setOptions] = useState([]);
+//   const fetchRef = useRef(0);
+//   const debounceFetcher = useMemo(() => {
+//     const loadOptions = (value) => {
+//       fetchRef.current += 1;
+//       const fetchId = fetchRef.current;
+//       setOptions([]);
+//       setFetching(true);
+//       fetchOptions(value).then((newOptions) => {
+//         if (fetchId !== fetchRef.current) {
+//           // for fetch callback order
+//           return;
+//         }
+//         setOptions(newOptions);
+//         setFetching(false);
+//       });
+//     };
+//     return debounce(loadOptions, debounceTimeout);
+//   }, [fetchOptions, debounceTimeout]);
+//   return (
+//     <Select
+//       labelInValue
+//       filterOption={false}
+//       onSearch={debounceFetcher}
+//       notFoundContent={fetching ? <Spin size="small" /> : null}
+//       {...props}
+//       options={options}
+//     />
+//   );
+// }
+
+// // Usage of DebounceSelect
+
+// async function fetchUserList(username) {
+//   console.log('fetching user', username);
+//   return fetch('https://randomuser.me/api/?results=5')
+//     .then((response) => response.json())
+//     .then((body) =>
+//       body.results.map((user) => ({
+//         label: `${user.name.first} ${user.name.last}`,
+//         value: user.login.username,
+//       })),
+//     );
+// }
+// const App = () => {
+//   const [value, setValue] = useState([]);
+//   return (
+//     <DebounceSelect
+//       mode="multiple"
+//       value={value}
+//       placeholder="Select users"
+//       fetchOptions={fetchUserList}
+//       onChange={(newValue) => {
+//         setValue(newValue);
+//       }}
+//       style={{
+//         width: '100%',
+//       }}
+//     />
+//   );
+// };
+// export default App;
 
 export default AdminDashboard;
