@@ -4,6 +4,7 @@ import path from 'path';
 
 
 export default defineConfig({
+  base: './', // Ensures relative paths for assets
   plugins: [react()],
   resolve: {
     alias: {
