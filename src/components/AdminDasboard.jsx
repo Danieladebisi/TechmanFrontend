@@ -11,26 +11,28 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState([]);
   const [admin, setAdmin] = useState({ name: "", email: "", image: "" });
 
+  //axios instance 
   const API = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
   });
 
-  useEffect(() => {
-    API.get("/getAll")
-      .then((response) => setDevices(response.data))
-      .catch((error) => console.error("Error fetching devices:", error));
-  }, []);
+  // useEffect(() => {
+  //   API.get("/getAllPhones")
+  //     .then((response) => setDevices(response.data))
+  //     .catch((error) => console.error("Error fetching devices:", error));
+  // }, []);
 
   useEffect(() => {
     const adminEmail = localStorage.getItem("adminEmail"); // Assuming email is stored after login
     if (adminEmail) {
-      API.get(`/auth/login`)
+      API.post("/auth/login", { email: adminEmail }) // ✅ Use POST
         .then((response) => setAdmin(response.data))
         .catch((error) =>
           console.error("Error fetching admin details:", error)
         );
     }
   }, []);
+  
 
   const handleShow = (device = null) => {
     setEditDevice(device);

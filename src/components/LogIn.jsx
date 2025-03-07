@@ -1,15 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebaseConfig"; // Adjust as needed
+import axios from "axios";
 import Swal from "sweetalert2";
 import { FaUser, FaLock } from "react-icons/fa";
 import Logo from "../assets/Logo.png";
-
-const ADMIN_CREDENTIALS = {
-  email: "uwaomaobinna20@gmail.com", // Replace with actual admin email
-  password: "Micheal20", // Replace with actual admin password
-};
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,55 +14,35 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Please fill in all fields.",
-      });
+      Swal.fire({ icon: "error", title: "Oops...", text: "Please fill in all fields." });
       return;
     }
 
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      localStorage.setItem("adminEmail", userCredential.user.email);
+      // Call API with a POST request for login
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { email, password });
+      console.log(response);
+      if (response.data && response.status === 200) {
+        // Store admin details
+        localStorage.setItem("adminEmail", response.data.user);
+        localStorage.setItem("adminToken", response.data.token);
 
-      // Verify if the user is the admin
-      if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-        Swal.fire({
-          icon: "success",
-          title: "Login Successful",
-          text: "Redirecting to Home...",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-
-        navigate("/adminDashboard"); // Redirect to Home
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Access Denied",
-          text: "Invalid admin credentials.",
-        });
+        Swal.fire({ icon: "success", title: "Login Successful", text: "Redirecting...", timer: 1500, showConfirmButton: false });
+        navigate("/adminDashboard");
       }
-    } catch (err) {
-      let errorMessage = "Invalid email or password.";
-      if (err.code === "auth/user-not-found") errorMessage = "User not found.";
-      if (err.code === "auth/wrong-password") errorMessage = "Incorrect password.";
-      if (err.code === "auth/too-many-requests")
-        errorMessage = "Too many attempts. Try again later.";
-
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: errorMessage,
+    } catch (error) {
+      Swal.fire({ 
+        icon: "error", 
+        title: "Login Failed", 
+        text: error.response?.data?.message || "Invalid credentials." 
       });
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-gradient">
       <div className="card shadow-lg p-4" style={{ width: "400px", borderRadius: "15px" }}>
@@ -95,8 +69,7 @@ const Login = () => {
               <input
                 type="email"
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={email} onChange={(e) => setEmail(e.target.value)}
                 className="form-control"
                 required
                 aria-label="Email Address"
@@ -111,8 +84,7 @@ const Login = () => {
               <input
                 type="password"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={password} onChange={(e) => setPassword(e.target.value)}
                 className="form-control"
                 required
                 aria-label="Password"
@@ -131,9 +103,7 @@ const Login = () => {
               type="submit"
               className="btn btn-lg w-100 text-white shadow"
               style={{ background: "#3871b1" }}
-              disabled={loading}
-            >
-              {loading ? "Logging in..." : "LOGIN"}
+              disabled={loading}>{loading ? "Logging in..." : "Login"}
             </button>
           </form>
         </div>
