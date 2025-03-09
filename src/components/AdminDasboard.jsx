@@ -36,7 +36,7 @@ const AdminDashboard = () => {
 
   const handleShow = (device = null) => {
     setEditDevice(device);
-    setFormData(device || { name: "", type: "" });
+    setFormData(device || { name: "", network: "" });
     setShow(true);
   };
 
@@ -74,7 +74,7 @@ const AdminDashboard = () => {
           )
         );
       } else {
-        const response = await axios.post("/create", formData);
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/Create`, formData);
         setDevices([...devices, response.data]);
       }
       handleClose();
@@ -181,7 +181,7 @@ const AdminDashboard = () => {
                       "No Image"
                     )}
                   </td>
-                  <td>{device.network}</td>
+                  <td>{device.network.map()}</td>
                   <td>{device.feature}</td>
                   <td>{device.launch}</td>
                   <td>{device.brightness}</td>
@@ -239,13 +239,13 @@ const AdminDashboard = () => {
                   <Form.Label>Network</Form.Label>
                   <Form.Control
                     type="text"
-                    name="type"
-                    value={formData.type}
+                    name="network"
+                    value={formData.network}
                     onChange={handleChange}
                     required
                   />
                 </Form.Group>
-                <Form.Group className="mb-3">
+                {/* <Form.Group className="mb-3">
                   <Form.Label>Launch</Form.Label>
                   <Form.Control
                     type="text"
@@ -404,7 +404,7 @@ const AdminDashboard = () => {
                     onChange={handleChange}
                     required
                   />
-                </Form.Group>
+                </Form.Group> */}
                 <Button variant="primary" type="submit">
                   {editDevice ? "Update" : "Add"}
                 </Button>
