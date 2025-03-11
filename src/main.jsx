@@ -18,7 +18,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [  // ✅ Nest child routes inside App
-      { path: "", element: <Home /> },
+      { path: "", element: <Compare /> },
       { path: "compare", element: <Compare /> },
       { path: "contact", element: <Contact /> },
       { path: "comparePhones", element: <ComparePhones /> },
