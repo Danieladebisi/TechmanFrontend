@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 //import NavDropdown from "react-bootstrap/NavDropdown";
-import Logo from "../assets/Logo.png";
+import Logo from "../assets/Tech Mansion_Logo.png";
 import { Link } from "react-router-dom";
 import "./NavbarMenu.css";
 
@@ -13,11 +13,11 @@ function NavbarMenu({ admin, onLogout }) {
   return (
     <Navbar expand="lg" className="bg-teal-500 shadow-lg">
       <Container fluid>
-        <Navbar.Brand href="#">
+        <Navbar.Brand href="/compare">
           <img
             src={Logo}
-            width="110"
-            height="50"
+            width="200"
+            height="80"
             className="d-inline-block align-top"
             alt="Techmansion logo"
           />
