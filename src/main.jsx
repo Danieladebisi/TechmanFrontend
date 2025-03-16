@@ -23,7 +23,7 @@ const router = createBrowserRouter([
       { path: "contact", element: <Contact /> },
       { path: "comparePhones", element: <ComparePhones /> },
       { path: "pictures", element: <PhonePictures /> },
-      { path: "/login", element: <Login /> }, {/* Dynamic login route */}
+      { path: "/login", element: <Login /> }, /* Dynamic login route */
       { path: "adminDashBoard", element: <AdminDashboard /> },
     ],
   },
