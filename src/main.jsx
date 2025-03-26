@@ -12,7 +12,7 @@ import Login from "./components/LogIn.jsx";
 import AdminDashboard from "./components/AdminDasboard.jsx";
 
 // Set basename based on your deployment
-const basename = "/app"; // For Netlify subpath deployment
+const basename = "/"; // For Netlify subpath deployment
 
 const router = createBrowserRouter([
   {
