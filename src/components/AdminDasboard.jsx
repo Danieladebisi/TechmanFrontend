@@ -181,7 +181,9 @@ const AdminDashboard = () => {
                       "No Image"
                     )}
                   </td>
-                  <td>{device.network.map()}</td>
+                  <td>{device.network.map(network => <div>
+                    ne
+                  </div>)}</td>
                   <td>{device.feature}</td>
                   <td>{device.launch}</td>
                   <td>{device.brightness}</td>
