@@ -16,22 +16,23 @@ const AdminDashboard = () => {
     baseURL: import.meta.env.VITE_API_URL,
   });
 
+  //remove this two comment
   // useEffect(() => {
   //   API.get("/getAllPhones")
   //     .then((response) => setDevices(response.data))
   //     .catch((error) => console.error("Error fetching devices:", error));
   // }, []);
 
-  useEffect(() => {
-    const adminEmail = localStorage.getItem("adminEmail"); // Assuming email is stored after login
-    if (adminEmail) {
-      API.post("/auth/login", { email: adminEmail }) // ✅ Use POST
-        .then((response) => setAdmin(response.data))
-        .catch((error) =>
-          console.error("Error fetching admin details:", error)
-        );
-    }
-  }, []);
+  // useEffect(() => {
+  //   const adminEmail = localStorage.getItem("adminEmail"); // Assuming email is stored after login
+  //   if (adminEmail) {
+  //     API.post("/auth/login", { email: adminEmail }) // ✅ Use POST
+  //       .then((response) => setAdmin(response.data))
+  //       .catch((error) =>
+  //         console.error("Error fetching admin details:", error)
+  //       );
+  //   }
+  // }, []);
   
 
   const handleShow = (device = null) => {

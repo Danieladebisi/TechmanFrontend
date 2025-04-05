@@ -10,33 +10,51 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const handleLogin = async (e) => {
     e.preventDefault();
+  
     if (!email || !password) {
-      Swal.fire({ icon: "error", title: "Oops...", text: "Please fill in all fields." });
+      Swal.fire({
+        icon: "error",
+        title: "Missing Fields",
+        text: "Please fill in both email and password.",
+      });
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
-      // Call API with a POST request for login
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { email, password });
-      console.log(response);
-      if (response.data && response.status === 200) {
-        // Store admin details
-        localStorage.setItem("adminEmail", response.data.user);
-        localStorage.setItem("adminToken", response.data.token);
-
-        Swal.fire({ icon: "success", title: "Login Successful", text: "Redirecting...", timer: 1500, showConfirmButton: false });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        email,
+        password,
+      });
+  
+      // Successful login
+      if (response.data?.success && response.status === 200) {
+        localStorage.setItem("adminEmail", response.data.data?.email);
+        localStorage.setItem("adminToken", response.data.data?.token);
+  
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          text: "Redirecting...",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+  
         navigate("/adminDashboard");
+      } else {
+        throw new Error("Invalid login response.");
       }
     } catch (error) {
-      Swal.fire({ 
-        icon: "error", 
-        title: "Login Failed", 
-        text: error.response?.data?.message || "Invalid credentials." 
+      const errorMessage =
+        error.response?.data?.statusMessage || error.message || "Login failed. Please try again.";
+  
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: errorMessage,
       });
     } finally {
       setLoading(false);
