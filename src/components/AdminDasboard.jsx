@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Navbar, Nav, Table, Button, Form, Modal } from "react-bootstrap";
+import { Navbar, Nav, Table, Button, Form, Modal, Row, Col, Image } from "react-bootstrap";
 import Swal from "sweetalert2";
 import Logo from "../assets/Logo.png";
 
@@ -8,161 +8,223 @@ const AdminDashboard = () => {
   const [devices, setDevices] = useState([]);
   const [show, setShow] = useState(false);
   const [editDevice, setEditDevice] = useState(null);
-  const [formData, setFormData] = useState([]);
+  const [formData, setFormData] = useState({});
   const [admin, setAdmin] = useState({ name: "", email: "", image: "" });
 
-  //axios instance 
   const API = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
-  //remove this two comment
-  // useEffect(() => {
-  //   API.get("/getAllPhones")
-  //     .then((response) => setDevices(response.data))
-  //     .catch((error) => console.error("Error fetching devices:", error));
-  // }, []);
+  useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const response = await API.get("/GetAll-Phones");
+        setDevices([response.data]);
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    };
+    fetchDevices(); // Fix the typo here
+  }, []);
 
-  // useEffect(() => {
-  //   const adminEmail = localStorage.getItem("adminEmail"); // Assuming email is stored after login
-  //   if (adminEmail) {
-  //     API.post("/auth/login", { email: adminEmail }) // ✅ Use POST
-  //       .then((response) => setAdmin(response.data))
-  //       .catch((error) =>
-  //         console.error("Error fetching admin details:", error)
-  //       );
-  //   }
-  // }, []);
-  
+  const emptyDevice = {
+    name: "",
+    imageUrl: "",
+    network: { technology: "" },
+    launch: { announced: "", status: "" },
+    body: { dimension: "", weight: "", build: "", sim: "" },
+    display: { type: "", size: "", resolution: "" },
+    communication: { 
+      wlan: "", 
+      bluetooth: "", 
+      positioning: "", 
+      nfc: "", 
+      infrared_port: "", 
+      radio: "", 
+      usd: "" 
+    },
+    battery: { type: "", charging: "" },
+    feature: { sensors: "" },
+    mainCamera: { modules: "", features: "", video: "" },
+    memory: { cardSlot: "", internal: "" },
+    misc: { 
+      colors: "", 
+      sar: "", 
+      sareu: "", 
+      models: "", 
+      price: "" 
+    },
+    platform: { 
+      os: "", 
+      chipset: "", 
+      cpu: "", 
+      gpu: "" 
+    },
+    selfieCamera: { module: "", video: "" },
+    sound: { loudspeaker: "", _35mm_jack: "" },
+    test: { 
+      performance: "", 
+      display: "", 
+      loudspeaker: "", 
+      battery: "" 
+    },
+  };
 
   const handleShow = (device = null) => {
     setEditDevice(device);
-    setFormData(device || { name: "", network: "" });
+    setFormData(device ? { ...device } : emptyDevice);
     setShow(true);
   };
 
   const handleClose = () => setShow(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const keys = name.split(".");
+    setFormData((prev) => {
+      const updated = { ...prev };
+      let nested = updated;
+      for (let i = 0; i < keys.length - 1; i++) {
+        nested[keys[i]] = nested[keys[i]] || {};
+        nested = nested[keys[i]];
+      }
+      nested[keys[keys.length - 1]] = value;
+      return { ...updated };
+    });
   };
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-  
-    const formData = new FormData();
-    formData.append("file", file);
-  
+    const uploadForm = new FormData();
+    uploadForm.append("file", file);
     try {
-      const response = await API.post("/upload", formData, {
+      const response = await API.post("/upload", uploadForm, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setFormData({ ...formData, imageUrl: response.data.imageUrl }); // Save uploaded image URL
+      setFormData(prev => ({
+        ...prev,
+        imageUrl: response.data.imageUrl
+      }));
     } catch (error) {
       console.error("Error uploading image:", error);
     }
-  };  
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+
     try {
       if (editDevice) {
         await API.put(`/update/${editDevice.id}`, formData);
-        setDevices(
-          devices.map((d) =>
-            d.id === editDevice.id ? { ...d, ...formData } : d
-          )
-        );
+        setDevices(devices.map((d) => (d.id === editDevice.id ? formData : d)));
       } else {
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/Create`, formData);
+        const response = await API.post(`/Create`, formData, config);
         setDevices([...devices, response.data]);
+        console.log("Sending data:", JSON.stringify(formData, null, 2));
       }
       handleClose();
+      Swal.fire({
+        title: "Success!",
+        text: `Device ${editDevice ? "updated" : "added"} successfully`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false
+      });
     } catch (error) {
       console.error("Error saving device:", error);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to save device",
+        icon: "error",
+      });
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`/delete/${id}`);
-      setDevices(devices.filter((device) => device.id !== id));
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, delete it!"
+      });
+
+      if (result.isConfirmed) {
+        await API.delete(`/delete/${id}`);
+        setDevices(devices.filter((device) => device.id !== id));
+        Swal.fire("Deleted!", "The device has been deleted.", "success");
+      }
     } catch (error) {
       console.error("Error deleting device:", error);
+      Swal.fire("Error!", "Failed to delete device", "error");
     }
   };
 
-  const handleLogout = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You will be logged out!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, logout!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        localStorage.removeItem("adminEmail");
-        window.location.href = "/login";
-      }
-    });
+  const formatTableData = (data, subFields) => {
+    if (!data) return "-";
+    if (typeof data === "string") return data;
+    
+    return subFields
+      .map(field => data[field] || "")
+      .filter(value => value)
+      .join(", ");
   };
 
   return (
-    <>
-      <div>
-        <Navbar
-          style={{ backgroundColor: "#53a2ff" }}
-          expand="lg"
-          className="px-3"
-        >
-          <Navbar.Brand href="#">
-            <img
-              src={Logo}
-              width="170"
-              height="60"
-              className="d-inline-block align-top"
-              alt="Techmansion logo"
-            />
-          </Navbar.Brand>
-          <Nav className="ms-auto d-flex align-items-center">
-            {admin.image && (
-              <img
-                src={admin.image}
-                alt="Admin"
-                className="rounded-circle me-2"
-                width="40"
-              />
-            )}
-            <span className="text-white me-3">{admin.email}</span>
-            <Button variant="danger" onClick={handleLogout}>
-              Logout
-            </Button>
-          </Nav>
-        </Navbar>
+    <div>
+      <Navbar style={{ backgroundColor: "#53a2ff" }} expand="lg" className="px-3">
+        <Navbar.Brand href="#">
+          <img src={Logo} width="170" height="60" alt="Techmansion logo" />
+        </Navbar.Brand>
+        <Nav className="ms-auto d-flex align-items-center">
+          {admin.image && <img src={admin.image} alt="Admin" className="rounded-circle me-2" width="40" />}
+          <span className="text-white me-3">{admin.email}</span>
+          <Button variant="danger" onClick={() => {
+            localStorage.removeItem("adminEmail");
+            window.location.href = "/login";
+          }}>Logout</Button>
+        </Nav>
+      </Navbar>
 
-        <div className="container mt-5">
-          <h2>Admin Dashboard</h2>
-          <Button variant="primary" onClick={() => handleShow()}>
-            Add Device
-          </Button>
-          <Table striped bordered hover className="mt-3">
+      <div className="container mt-5">
+        <h2>Admin Dashboard</h2>
+        <Button variant="primary" onClick={() => handleShow()} className="mb-3">
+          Add Device
+        </Button>
+        
+        <div className="table-responsive">
+          <Table striped bordered hover>
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Name</th>
                 <th>Image</th>
-                <th>Body</th>
                 <th>Network</th>
-                <th>Feature</th>
                 <th>Launch</th>
-                <th>Brightness</th>
-                <th>Charging</th>
-                <th>Battery</th>
+                <th>Body</th>
+                <th>Display</th>
                 <th>Communication</th>
+                <th>Battery</th>
+                <th>Feature</th>
+                <th>MainCamera</th>
+                <th>Memory</th>
                 <th>Misc</th>
+                <th>Platform</th>
+                <th>SelfieCamera</th>
                 <th>Sound</th>
+                <th>Test</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -170,38 +232,40 @@ const AdminDashboard = () => {
               {devices.map((device) => (
                 <tr key={device.id}>
                   <td>{device.id}</td>
+                  <td>{device.name}</td>
                   <td>
                     {device.imageUrl ? (
-                      <img
-                        src={device.imageUrl}
-                        alt="Device"
-                        width="60"
-                        height="60"
-                      />
+                      <Image src={device.imageUrl} alt={device.name} thumbnail width={60} height={60} />
                     ) : (
                       "No Image"
                     )}
                   </td>
-                  <td>{device.network.map(network => <div>
-                    ne
-                  </div>)}</td>
-                  <td>{device.feature}</td>
-                  <td>{device.launch}</td>
-                  <td>{device.brightness}</td>
-                  <td>{device.charging}</td>
-                  <td>{device.battery}</td>
-                  <td>{device.communication}</td>
-                  <td>{device.misc}</td>
-                  <td>{device.sound}</td>
+                  <td>{formatTableData(device.network, ["technology"])}</td>
+                  <td>{formatTableData(device.launch, ["announced", "status"])}</td>
+                  <td>{formatTableData(device.body, ["dimension", "weight", "build", "sim"])}</td>
+                  <td>{formatTableData(device.display, ["type", "size", "resolution"])}</td>
+                  <td>{formatTableData(device.communication, ["wlan", "bluetooth", "positioning", "nfc", "infrared_port", "radio", "usd"])}</td>
+                  <td>{formatTableData(device.battery, ["type", "charging"])}</td>
+                  <td>{formatTableData(device.feature, ["sensors"])}</td>
+                  <td>{formatTableData(device.mainCamera, ["modules", "features", "video"])}</td>
+                  <td>{formatTableData(device.memory, ["cardSlot", "internal"])}</td>
+                  <td>{formatTableData(device.misc, ["colors", "sar", "sareu", "models", "price"])}</td>
+                  <td>{formatTableData(device.platform, ["os", "chipset", "cpu", "gpu"])}</td>
+                  <td>{formatTableData(device.selfieCamera, ["module", "video"])}</td>
+                  <td>{formatTableData(device.sound, ["loudspeaker", "_35mm_jack"])}</td>
+                  <td>{formatTableData(device.test, ["performance", "display", "loudspeaker", "battery"])}</td>
                   <td>
-                    <Button
-                      variant="warning"
+                    <Button 
+                      variant="warning" 
+                      size="sm" 
                       onClick={() => handleShow(device)}
+                      className="me-2"
                     >
                       Edit
-                    </Button>{" "}
-                    <Button
-                      variant="danger"
+                    </Button>
+                    <Button 
+                      variant="danger" 
+                      size="sm" 
                       onClick={() => handleDelete(device.id)}
                     >
                       Delete
@@ -211,281 +275,498 @@ const AdminDashboard = () => {
               ))}
             </tbody>
           </Table>
+        </div>
 
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>
-                {editDevice ? "Edit Device" : "Add Device"}
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
+        {/* Add/Edit Device Modal */}
+        <Modal show={show} onHide={handleClose} size="xl" scrollable>
+          <Modal.Header closeButton>
+            <Modal.Title>{editDevice ? "Edit Device" : "Add New Device"}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form onSubmit={handleSubmit}>
+              <Row>
+                <Col md={6}>
+                  <h5>Basic Information</h5>
                   <Form.Group className="mb-3">
-                    <Form.Label>Upload Image</Form.Label>
-                    <Form.Control
-                      type="file"
-                      onChange={handleImageUpload}
-                      accept="image/*"
+                    <Form.Label>Device Name*</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="name" 
+                      value={formData.name || ""} 
+                      onChange={handleChange} 
+                      required 
                     />
                   </Form.Group>
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Network</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="network"
-                    value={formData.network}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                {/* <Form.Group className="mb-3">
-                  <Form.Label>Launch</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Body</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Display</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Platform</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Memories</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>MainCameras</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>SelfieCameras</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Sound</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Communications</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Features</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Battery</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Miscs</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Protections</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Modules</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Brightness</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Charging</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    required
-                  />
-                </Form.Group> */}
-                <Button variant="primary" type="submit">
-                  {editDevice ? "Update" : "Add"}
+
+                  <Form.Group className="mb-3">
+                    <Form.Label>Image</Form.Label>
+                    <Form.Control 
+                      type="file" 
+                      onChange={handleImageUpload} 
+                      accept="image/*" 
+                    />
+                    {formData.imageUrl && (
+                      <div className="mt-2">
+                        <Image src={formData.imageUrl} thumbnail width={100} />
+                        <Form.Control
+                          type="text"
+                          name="imageUrl"
+                          value={formData.imageUrl || ""}
+                          onChange={handleChange}
+                          className="mt-2"
+                          placeholder="Or enter image URL"
+                        />
+                      </div>
+                    )}
+                  </Form.Group>
+
+                  <h5 className="mt-4">Network</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Technology</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="network.technology" 
+                      value={formData.network?.technology || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+
+                  <h5 className="mt-4">Launch</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Announced</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="launch.announced" 
+                      value={formData.launch?.announced || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Status</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="launch.status" 
+                      value={formData.launch?.status || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+
+                  <h5 className="mt-4">Body</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Dimensions</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="body.dimension" 
+                      value={formData.body?.dimension || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Weight</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="body.weight" 
+                      value={formData.body?.weight || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Build</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="body.build" 
+                      value={formData.body?.build || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>SIM</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="body.sim" 
+                      value={formData.body?.sim || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={6}>
+                  <h5>Display</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Type</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="display.type" 
+                      value={formData.display?.type || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Size</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="display.size" 
+                      value={formData.display?.size || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Resolution</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="display.resolution" 
+                      value={formData.display?.resolution || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+
+                  <h5 className="mt-4">Platform</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>OS</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="platform.os" 
+                      value={formData.platform?.os || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Chipset</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="platform.chipset" 
+                      value={formData.platform?.chipset || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>CPU</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="platform.cpu" 
+                      value={formData.platform?.cpu || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>GPU</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="platform.gpu" 
+                      value={formData.platform?.gpu || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              {/* Additional sections for other fields */}
+              <Row className="mt-3">
+                <Col md={6}>
+                  <h5>Memory</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Card Slot</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="memory.cardSlot" 
+                      value={formData.memory?.cardSlot || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Internal</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="memory.internal" 
+                      value={formData.memory?.internal || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+
+                  <h5 className="mt-4">Main Camera</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Modules</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="mainCamera.modules" 
+                      value={formData.mainCamera?.modules || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Features</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="mainCamera.features" 
+                      value={formData.mainCamera?.features || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Video</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="mainCamera.video" 
+                      value={formData.mainCamera?.video || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={6}>
+                  <h5>Selfie Camera</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Module</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="selfieCamera.module" 
+                      value={formData.selfieCamera?.module || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Video</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="selfieCamera.video" 
+                      value={formData.selfieCamera?.video || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+
+                  <h5 className="mt-4">Sound</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Loudspeaker</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="sound.loudspeaker" 
+                      value={formData.sound?.loudspeaker || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>3.5mm Jack</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="sound._35mm_jack" 
+                      value={formData.sound?._35mm_jack || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row className="mt-3">
+                <Col md={6}>
+                  <h5>Communication</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>WLAN</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="communication.wlan" 
+                      value={formData.communication?.wlan || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Bluetooth</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="communication.bluetooth" 
+                      value={formData.communication?.bluetooth || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Positioning</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="communication.positioning" 
+                      value={formData.communication?.positioning || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>NFC</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="communication.nfc" 
+                      value={formData.communication?.nfc || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Infrared Port</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="communication.infrared_port" 
+                      value={formData.communication?.infrared_port || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Radio</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="communication.radio" 
+                      value={formData.communication?.radio || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>USB</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="communication.usd" 
+                      value={formData.communication?.usd || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={6}>
+                  <h5>Battery</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Type</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="battery.type" 
+                      value={formData.battery?.type || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Charging</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="battery.charging" 
+                      value={formData.battery?.charging || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+
+                  <h5 className="mt-4">Features</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Sensors</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="feature.sensors" 
+                      value={formData.feature?.sensors || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+
+                  <h5 className="mt-4">Misc</h5>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Colors</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="misc.colors" 
+                      value={formData.misc?.colors || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>SAR</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="misc.sar" 
+                      value={formData.misc?.sar || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>SAR EU</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="misc.sareu" 
+                      value={formData.misc?.sareu || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Models</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="misc.models" 
+                      value={formData.misc?.models || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Price</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="misc.price" 
+                      value={formData.misc?.price || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <h5 className="mt-4">Tests</h5>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Performance</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="test.performance" 
+                      value={formData.test?.performance || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Display</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="test.display" 
+                      value={formData.test?.display || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Loudspeaker</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="test.loudspeaker" 
+                      value={formData.test?.loudspeaker || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Battery Life</Form.Label>
+                    <Form.Control 
+                      type="text" 
+                      name="test.battery" 
+                      value={formData.test?.battery || ""} 
+                      onChange={handleChange} 
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <div className="d-flex justify-content-end mt-4">
+                <Button variant="secondary" onClick={handleClose} className="me-2">
+                  Cancel
                 </Button>
-              </Form>
-            </Modal.Body>
-          </Modal>
-        </div>
+                <Button variant="primary" type="submit">
+                  {editDevice ? "Update Device" : "Add Device"}
+                </Button>
+              </div>
+            </Form>
+          </Modal.Body>
+        </Modal>
       </div>
-    </>
+    </div>
   );
 };
-
-// import React, { useMemo, useRef, useState } from 'react';
-// import { Select, Spin } from 'antd';
-// import debounce from 'lodash/debounce';
-// function DebounceSelect({ fetchOptions, debounceTimeout = 800, ...props }) {
-//   const [fetching, setFetching] = useState(false);
-//   const [options, setOptions] = useState([]);
-//   const fetchRef = useRef(0);
-//   const debounceFetcher = useMemo(() => {
-//     const loadOptions = (value) => {
-//       fetchRef.current += 1;
-//       const fetchId = fetchRef.current;
-//       setOptions([]);
-//       setFetching(true);
-//       fetchOptions(value).then((newOptions) => {
-//         if (fetchId !== fetchRef.current) {
-//           // for fetch callback order
-//           return;
-//         }
-//         setOptions(newOptions);
-//         setFetching(false);
-//       });
-//     };
-//     return debounce(loadOptions, debounceTimeout);
-//   }, [fetchOptions, debounceTimeout]);
-//   return (
-//     <Select
-//       labelInValue
-//       filterOption={false}
-//       onSearch={debounceFetcher}
-//       notFoundContent={fetching ? <Spin size="small" /> : null}
-//       {...props}
-//       options={options}
-//     />
-//   );
-// }
-
-// // Usage of DebounceSelect
-
-// async function fetchUserList(username) {
-//   console.log('fetching user', username);
-//   return fetch('https://randomuser.me/api/?results=5')
-//     .then((response) => response.json())
-//     .then((body) =>
-//       body.results.map((user) => ({
-//         label: `${user.name.first} ${user.name.last}`,
-//         value: user.login.username,
-//       })),
-//     );
-// }
-// const App = () => {
-//   const [value, setValue] = useState([]);
-//   return (
-//     <DebounceSelect
-//       mode="multiple"
-//       value={value}
-//       placeholder="Select users"
-//       fetchOptions={fetchUserList}
-//       onChange={(newValue) => {
-//         setValue(newValue);
-//       }}
-//       style={{
-//         width: '100%',
-//       }}
-//     />
-//   );
-// };
-// export default App;
 
 export default AdminDashboard;

@@ -83,7 +83,7 @@ const Login = () => {
             <div className="mb-3 input-group">
               <span className="input-group-text bg-gradient text-black">
                 <FaUser />
-              </span>
+              </span> 
               <input
                 type="email"
                 placeholder="Email"
@@ -91,7 +91,7 @@ const Login = () => {
                 className="form-control"
                 required
                 aria-label="Email Address"
-              />
+              /> 
             </div>
 
             {/* Password Field */}
