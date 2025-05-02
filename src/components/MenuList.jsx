@@ -15,12 +15,12 @@ const MenuList = () => {
   ];
 
   return (
-    <div className="list-group">
+    <div className="list-group" style={{background: "linear-gradient(135deg, rgba(117,235,171,0.9) 0%, rgba(117,235,171,0.7) 50%, rgba(117,235,171,0.9) 100%)" }}>
       {/* Compare Dropdown */}
       <div
         className="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-decoration-none"
         onClick={() => setCompareOpen(!compareOpen)}
-        style={{ cursor: "pointer" }}
+        style={{ cursor: "pointer", background: "linear-gradient(135deg, rgba(117,235,171,0.9) 0%, rgba(117,235,171,0.7) 50%, rgba(117,235,171,0.9) 100%)"}}
       >
         <div className="d-flex align-items-center">
           <span className="me-3 text-secondary"><BsColumnsGap size={20} /></span>
