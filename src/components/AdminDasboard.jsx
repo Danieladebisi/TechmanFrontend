@@ -180,7 +180,7 @@ const AdminDashboard = () => {
 
   return (
     <div>
-      <Navbar style={{ backgroundColor: "#53a2ff" }} expand="lg" className="px-3">
+      <Navbar style={{ backgroundColor: "#rgba(255, 102, 0, 0.4)" }} expand="lg" className="px-3">
         <Navbar.Brand href="#">
           <img src={Logo} width="170" height="60" alt="Techmansion logo" />
         </Navbar.Brand> 
