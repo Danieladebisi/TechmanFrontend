@@ -109,24 +109,40 @@ const AdminDashboard = () => {
       imageUrl: URL.createObjectURL(file) // For preview
     }));
   };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    try {
+      const formDataToSend = new FormData();
+      
+      // Append all fields to formData
+      Object.keys(formData).forEach(key => {
+        if (key !== 'imageFile') {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+      
+      // Append the image file if it exists
+      if (formData.imageFile) {
+        formDataToSend.append('image', formData.imageFile);
+      }
+  
       const config = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       };
-
-    try {
+  
       if (editDevice) {
-        await API.put(`/update/${editDevice.id}`, formData);
-        setDevices(devices.map((d) => (d.id === editDevice.id ? formData : d)));
+        await API.put(`/update/${editDevice.id}`, formDataToSend, config);
+        setDevices(devices.map(d => (d.id === editDevice.id ? formData : d)));
       } else {
-        console.log("Sending data:", JSON.stringify(formData, null, 2))
-        const response = await API.post("/Create", formData, config);
+        const response = await API.post("/Create", formDataToSend, config);
         setDevices(prevDevices => [...prevDevices, response.data]);
-        console.log("API Response:", response.data);
       }
+      
       handleClose();
       Swal.fire({
         title: "Success!",
@@ -230,20 +246,13 @@ const AdminDashboard = () => {
                 <tr key={device.id}>
                   <td>{device.id}</td>
                   <td>{device.name}</td>
-                  {/* <td>
-                    {device.imageFile ? (
-                      <Image src={device.imageFile} alt={device.name} thumbnail width={60} height={60} />
-                    ) : (
-                      "No Image"
-                    )}
-                  </td> */}
                   <td>
-                    {device.imageFile ? (
-                      <Image src={device.imageFile} alt={device.name} thumbnail width={60} height={60} />
-                    ) : (
-                      "No Image"
-                    )}
-                  </td>
+                {device.imageUrl ? (
+                  <Image src={device.imageUrl} alt={device.name} thumbnail width={60} height={60} />
+                  ) : (
+                  "No Image"
+                  )}
+                </td>
                   <td>{formatTableData(device.network, ["technology"])}</td>
                   <td>{formatTableData(device.launch, ["announced", "status"])}</td>
                   <td>{formatTableData(device.body, ["dimensions", "weight", "build", "sim"])}</td>

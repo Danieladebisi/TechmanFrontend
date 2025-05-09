@@ -46,7 +46,7 @@ const Compare = () => {
       <Container className="mt-4">
         <h2>SamSung Galaxy A06</h2>
         <p style={{ color: "grey", fontSize: ".9em" }}>SPECIFICATIONS</p>
-        <div className="card mb-3 p-2 border border-3 shadow-lg" style={{ maxWidth: "540px", background: "rgba(255, 102, 0, 0.4)" }}>
+        <div className="card mb-3 p-2 border border-3 shadow-lg" style={{ maxWidth: "540px", background: "linear-gradient(135deg, rgba(117,235,171,0.9) 0%, rgba(117,235,171,0.7) 50%, rgba(117,235,171,0.9) 100%)" }}>
           <div className="row g-0">
             <div className="col-md-4">
               <img

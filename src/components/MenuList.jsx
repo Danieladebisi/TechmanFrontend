@@ -20,7 +20,7 @@ const MenuList = () => {
       <div
         className="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-decoration-none"
         onClick={() => setCompareOpen(!compareOpen)}
-        style={{ cursor: "pointer", background: "rgba(236, 172, 129, 0.4)"}}
+        style={{ cursor: "pointer", background: "linear-gradient(135deg, rgba(117,235,171,0.9) 0%, rgba(117,235,171,0.7) 50%, rgba(117,235,171,0.9) 100%)"}}
       >
         <div className="d-flex align-items-center">
           <span className="me-3 text-secondary"><BsColumnsGap size={20} /></span>
