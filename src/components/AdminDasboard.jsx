@@ -9,6 +9,7 @@ const AdminDashboard = () => {
   const [show, setShow] = useState(false);
   const [editDevice, setEditDevice] = useState(null);
   const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
   const [admin, setAdmin] = useState({ name: "", email: "", image: "" });
 
   const API = axios.create({
@@ -20,9 +21,15 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchDevices = async () => {
+      setLoading(true)
       try {
         const response = await API.get("/GetAll-Phones");
-        setDevices(Array.isArray(response.data) ? response.data : []);
+        const {data} = response.data;
+        response.data.data;
+
+        setDevices(data);
+        console.log(response.data.data);
+        setLoading(false)
       } catch (error) {
         console.error("Error fetching devices:", error);
       }
@@ -74,7 +81,7 @@ const AdminDashboard = () => {
       loudspeaker: formData.loudspeaker , 
       battery: formData.battery  
     },
-    createdBy:{ createdBy: formData.createdBy}
+    // createdBy:{ createdBy: formData.createdBy}
   };
 
   const handleShow = (device = null) => {
@@ -201,7 +208,7 @@ const AdminDashboard = () => {
           <img src={Logo} width="170" height="60" alt="Techmansion logo" />
         </Navbar.Brand> 
         <Nav className="ms-auto d-flex align-items-center">
-          {admin.name && <img src={admin.image} alt="Admin" className="rounded-circle me-2" width="40" />}
+          {admin.email && <img src={admin.image} alt="Admin" className="rounded-circle me-2" width="40" />}
           <span className="text-white me-3">{admin.email}</span>
           <Button variant="danger" onClick={() => {
             localStorage.removeItem("adminEmail");
@@ -215,7 +222,8 @@ const AdminDashboard = () => {
         <Button variant="primary" onClick={() => handleShow()} className="mb-3">
           Add Device
         </Button>
-        
+        {/* Add loading state */}
+        {loading ? "show loading":
         <div className="table-responsive">
           <Table striped bordered hover>
             <thead>
@@ -237,7 +245,7 @@ const AdminDashboard = () => {
                 <th>SelfieCamera</th>
                 <th>Sound</th>
                 <th>Test</th>
-                <th>CreatedBy</th>
+                {/* <th>CreatedBy</th> */}
                 <th>Actions</th>
               </tr>
             </thead>
@@ -267,7 +275,7 @@ const AdminDashboard = () => {
                   <td>{formatTableData(device.selfieCamera, ["module", "video"])}</td>
                   <td>{formatTableData(device.sound, ["loudspeaker", "_35mm_jack"])}</td>
                   <td>{formatTableData(device.test, ["performance", "display", "loudspeaker", "battery"])}</td>
-                  <td>{formatTableData(device.createdBy, ["createdBy"])}</td>
+                  {/* <td>{formatTableData(device.createdBy, ["createdBy"])}</td> */}
                   <td>
                     <Button 
                       variant="warning" 
@@ -289,7 +297,7 @@ const AdminDashboard = () => {
               ))}
             </tbody>
           </Table>
-        </div>
+        </div>}
 
         {/* Add/Edit Device Modal */}
         <Modal show={show} onHide={handleClose} size="xl" scrollable>
@@ -750,8 +758,9 @@ const AdminDashboard = () => {
                       onChange={handleChange} 
                     />
                   </Form.Group>
-                </Col>
-                <Col md={6}>
+                </Col> 
+                {/*  */}
+                {/* <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>CreatedBy</Form.Label>
                     <Form.Control 
@@ -761,7 +770,7 @@ const AdminDashboard = () => {
                       onChange={handleChange} 
                     />
                   </Form.Group>
-                </Col>
+                </Col> */}
               </Row>
 
               <div className="d-flex justify-content-end mt-4">
