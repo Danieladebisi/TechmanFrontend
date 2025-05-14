@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Navbar, Nav, Table, Button, Form, Modal, Row, Col, Image } from "react-bootstrap";
 import Swal from "sweetalert2";
 import Logo from "../assets/Logo.png";
+import '../components/AdminDasboard.css'
+import Loader from "./Loader";
 
 const AdminDashboard = () => {
   const [devices, setDevices] = useState([]);
@@ -223,7 +225,11 @@ const AdminDashboard = () => {
           Add Device
         </Button>
         {/* Add loading state */}
-        {loading ? "show loading":
+        {loading ? <Loader/>
+          //   <div class="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+          //   <div class="custom-loader"></div>
+          // </div>
+          :
         <div className="table-responsive">
           <Table striped bordered hover>
             <thead>
